@@ -1,0 +1,1 @@
+dotenv rails db:create

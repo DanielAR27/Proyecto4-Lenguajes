@@ -1,0 +1,162 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Inicio", root_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Productos", products_path %></li>
+          <li class="breadcrumb-item active"><%= @product.name %></li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Información principal -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">
+            <i class="fas fa-box"></i> <%= @product.name %>
+            <% unless @product.active? %>
+              <span class="badge bg-secondary ms-2">Inactivo</span>
+            <% end %>
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Información Básica</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>Código:</strong></td>
+                  <td><code><%= @product.code %></code></td>
+                </tr>
+                <tr>
+                  <td><strong>Categoría:</strong></td>
+                  <td>
+                    <% if @product.category.present? %>
+                      <span class="badge bg-secondary"><%= @product.category %></span>
+                    <% else %>
+                      <span class="text-muted">Sin categoría</span>
+                    <% end %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Precio:</strong></td>
+                  <td><strong class="text-success"><%= @product.formatted_price %></strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Estado:</strong></td>
+                  <td>
+                    <% if @product.active? %>
+                      <span class="badge bg-success">Activo</span>
+                    <% else %>
+                      <span class="badge bg-secondary">Inactivo</span>
+                    <% end %>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Inventario</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>Stock Actual:</strong></td>
+                  <td>
+                    <span class="<%= @product.stock_status_class %>">
+                      <strong><%= @product.stock %> unidades</strong>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Stock Mínimo:</strong></td>
+                  <td><%= @product.min_stock %> unidades</td>
+                </tr>
+                <tr>
+                  <td><strong>Estado Stock:</strong></td>
+                  <td>
+                    <span class="<%= @product.stock_status_class %>">
+                      <%= @product.stock_status %>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Valor Total:</strong></td>
+                  <td><strong class="text-info">₡<%= number_with_delimiter(@product.total_value.to_f.round(2)) %></strong></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <% if @product.description.present? %>
+            <hr>
+            <h6>Descripción</h6>
+            <p class="text-muted"><%= simple_format(@product.description) %></p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel lateral -->
+    <div class="col-md-4">
+      <!-- Alertas de stock -->
+      <% if @product.low_stock? %>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Stock Bajo</strong><br>
+          Este producto tiene stock por debajo del mínimo establecido.
+        </div>
+      <% elsif @product.stock == 0 %>
+        <div class="alert alert-danger">
+          <i class="fas fa-times-circle"></i>
+          <strong>Sin Stock</strong><br>
+          Este producto no tiene unidades disponibles.
+        </div>
+      <% end %>
+
+      <!-- Información adicional -->
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información Adicional</h6>
+        </div>
+        <div class="card-body">
+          <p class="mb-2">
+            <strong>Creado:</strong><br>
+            <small class="text-muted"><%= @product.created_at.strftime("%d de %B de %Y a las %H:%M") %></small>
+          </p>
+          <p class="mb-0">
+            <strong>Última actualización:</strong><br>
+            <small class="text-muted"><%= @product.updated_at.strftime("%d de %B de %Y a las %H:%M") %></small>
+          </p>
+        </div>
+      </div>
+
+      <!-- Acciones rápidas -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-tools"></i> Acciones Rápidas</h6>
+        </div>
+        <div class="card-body">
+        <%= link_to "Editar Producto", edit_product_path(@product), 
+                    class: "btn btn-warning btn-sm d-block mb-2" %>
+        <%= button_to "Eliminar Producto", product_path(@product), method: :delete,
+                    class: "btn btn-danger btn-sm mb-2", 
+                    style: "width: 100%; border: none;",
+                    onclick: "return confirm('¿Eliminar permanentemente #{@product.name}? Esta acción no se puede deshacer.')" %>
+        <%= link_to "Todos los Productos", products_path, 
+                    class: "btn btn-outline-primary btn-sm d-block mb-2" %>
+        <% if @product.active? %>
+            <%= button_to "Desactivar", toggle_status_product_path(@product), method: :patch,
+                        class: "btn btn-outline-danger btn-sm w-100", 
+                        data: { confirm: "¿Desactivar '#{@product.name}'?" } %>
+        <% else %>
+            <%= button_to "Activar", toggle_status_product_path(@product), method: :patch,
+                        class: "btn btn-outline-success btn-sm w-100", 
+                        data: { confirm: "¿Activar '#{@product.name}'?" } %>
+        <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

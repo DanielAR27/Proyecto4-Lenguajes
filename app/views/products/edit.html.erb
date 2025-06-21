@@ -1,0 +1,23 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Inicio", root_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Productos", products_path %></li>
+          <li class="breadcrumb-item"><%= link_to @product.name, @product %></li>
+          <li class="breadcrumb-item active">Editar</li>
+        </ol>
+      </nav>
+      
+      <div class="d-flex align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="fas fa-edit text-warning"></i> 
+          Editar Producto: <%= @product.name %>
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <%= render 'form', product: @product %>
+</div>

@@ -1,0 +1,176 @@
+<%= form_with(model: product, local: true, class: "needs-validation", novalidate: true) do |form| %>
+  <% if product.errors.any? %>
+    <div class="alert alert-danger">
+      <h6><i class="fas fa-exclamation-triangle"></i> Se encontraron <%= product.errors.count %> errores:</h6>
+      <ul class="mb-0">
+        <% product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <!-- Información básica -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información Básica</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="mb-3">
+                <%= form.label :name, "Nombre del Producto *", class: "form-label" %>
+                <%= form.text_field :name, class: "form-control #{'is-invalid' if product.errors[:name].any?}", 
+                                   placeholder: "Ej: Laptop Dell Inspiron 15", required: true %>
+                <div class="invalid-feedback">
+                  <%= product.errors[:name].first if product.errors[:name].any? %>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <%= form.label :code, "Código *", class: "form-label" %>
+                <%= form.text_field :code, class: "form-control #{'is-invalid' if product.errors[:code].any?}", 
+                                   placeholder: "LAPTOP001", required: true %>
+                <div class="form-text">Si se deja vacío, se generará automáticamente</div>
+                <div class="invalid-feedback">
+                  <%= product.errors[:code].first if product.errors[:code].any? %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <%= form.label :category, "Categoría", class: "form-label" %>
+                <%= form.text_field :category, class: "form-control", 
+                                   placeholder: "Ej: Electrónicos, Ropa, etc." %>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <%= form.label :price, "Precio (₡) *", class: "form-label" %>
+                <div class="input-group">
+                  <span class="input-group-text">₡</span>
+                  <%= form.number_field :price, step: 0.01, min: 0, 
+                                       class: "form-control #{'is-invalid' if product.errors[:price].any?}", 
+                                       placeholder: "25000.00", required: true %>
+                  <div class="invalid-feedback">
+                    <%= product.errors[:price].first if product.errors[:price].any? %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= form.label :description, "Descripción", class: "form-label" %>
+            <%= form.text_area :description, rows: 3, class: "form-control", 
+                              placeholder: "Descripción detallada del producto..." %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventario y configuración -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-warehouse"></i> Inventario</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <%= form.label :stock, "Stock Actual *", class: "form-label" %>
+            <%= form.number_field :stock, min: 0, 
+                                 class: "form-control #{'is-invalid' if product.errors[:stock].any?}", 
+                                 placeholder: "100", required: true %>
+            <div class="invalid-feedback">
+              <%= product.errors[:stock].first if product.errors[:stock].any? %>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= form.label :min_stock, "Stock Mínimo *", class: "form-label" %>
+            <%= form.number_field :min_stock, min: 0, 
+                                 class: "form-control #{'is-invalid' if product.errors[:min_stock].any?}", 
+                                 placeholder: "10", required: true %>
+            <div class="form-text">Cantidad mínima antes de mostrar alerta</div>
+            <div class="invalid-feedback">
+              <%= product.errors[:min_stock].first if product.errors[:min_stock].any? %>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <%= form.check_box :active, class: "form-check-input" %>
+              <%= form.label :active, "Producto Activo", class: "form-check-label" %>
+            </div>
+            <div class="form-text">Los productos inactivos no aparecen en facturación</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen (solo en edición) -->
+      <% unless product.new_record? %>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-chart-line"></i> Resumen</h6>
+          </div>
+          <div class="card-body">
+            <p class="mb-1">
+              <strong>Valor en inventario:</strong><br>
+              <span class="text-success">₡<%= number_with_delimiter(product.total_value.to_f.round(2)) %></span>
+            </p>
+            <p class="mb-1">
+              <strong>Estado del stock:</strong><br>
+              <span class="<%= product.stock_status_class %>"><%= product.stock_status %></span>
+            </p>
+            <p class="mb-0">
+              <strong>Creado:</strong><br>
+              <small class="text-muted"><%= product.created_at.strftime("%d/%m/%Y") %></small>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between">
+        <%= link_to "Cancelar", products_path, class: "btn btn-secondary" %>
+        
+        <div>
+          <% unless product.new_record? %>
+            <%= link_to "Ver Producto", product, class: "btn btn-outline-info me-2" %>
+          <% end %>
+          <%= form.submit product.new_record? ? "Crear Producto" : "Actualizar Producto", 
+                         class: "btn btn-success" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script>
+// Validación de Bootstrap
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>

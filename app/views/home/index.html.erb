@@ -1,0 +1,35 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h1 class="text-center mb-0">
+            <%= @mensaje %>
+          </h1>
+        </div>
+        <div class="card-body">
+          <p class="lead text-center">
+            <%= @descripcion %>
+          </p>
+          
+          <hr>
+          
+          <h3>Características del Proyecto:</h3>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">✅ Gestión de Inventario</li>
+            <li class="list-group-item">✅ Sistema de Facturación</li>
+            <li class="list-group-item">✅ Cálculo automático de impuestos</li>
+            <li class="list-group-item">✅ Generación de PDF</li>
+            <li class="list-group-item">✅ Reportes de ventas y stock</li>
+          </ul>
+          
+          <div class="text-center mt-4">
+            <p class="text-muted">
+              Proyecto desarrollado con Ruby on Rails <%= Rails.version %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
