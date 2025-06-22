@@ -1,0 +1,115 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Inicio", root_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Impuestos", tax_types_path %></li>
+          <li class="breadcrumb-item active"><%= @tax_type.name %></li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Información principal -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">
+            <i class="fas fa-percentage"></i> <%= @tax_type.name %>
+            <% unless @tax_type.active? %>
+              <span class="badge bg-secondary ms-2">Inactivo</span>
+            <% end %>
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Información del Impuesto</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>Nombre:</strong></td>
+                  <td><strong><%= @tax_type.name %></strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Porcentaje:</strong></td>
+                  <td><strong class="text-success"><%= @tax_type.percentage_text %></strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Estado:</strong></td>
+                  <td>
+                    <% if @tax_type.active? %>
+                      <span class="badge bg-success">Activo</span>
+                    <% else %>
+                      <span class="badge bg-secondary">Inactivo</span>
+                    <% end %>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Detalles Adicionales</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>Valor Decimal:</strong></td>
+                  <td><%= @tax_type.percentage %></td>
+                </tr>
+                <tr>
+                  <td><strong>Formato Completo:</strong></td>
+                  <td><%= @tax_type.formatted_name %></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel lateral -->
+    <div class="col-md-4">
+      <!-- Información adicional -->
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información Adicional</h6>
+        </div>
+        <div class="card-body">
+          <p class="mb-2">
+            <strong>Creado:</strong><br>
+            <small class="text-muted"><%= @tax_type.created_at.strftime("%d de %B de %Y a las %H:%M") %></small>
+          </p>
+          <p class="mb-0">
+            <strong>Última actualización:</strong><br>
+            <small class="text-muted"><%= @tax_type.updated_at.strftime("%d de %B de %Y a las %H:%M") %></small>
+          </p>
+        </div>
+      </div>
+
+      <!-- Acciones rápidas -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-tools"></i> Acciones Rápidas</h6>
+        </div>
+        <div class="card-body">
+        <%= link_to "Editar Impuesto", edit_tax_type_path(@tax_type), 
+                    class: "btn btn-warning btn-sm d-block mb-2" %>
+        <%= button_to "Eliminar Impuesto", tax_type_path(@tax_type), method: :delete,
+                    class: "btn btn-danger btn-sm mb-2", 
+                    style: "width: 100%; border: none;",
+                    onclick: "return confirm('¿Eliminar permanentemente #{@tax_type.name}? Esta acción no se puede deshacer.')" %>
+        <%= link_to "Todos los Impuestos", tax_types_path, 
+                    class: "btn btn-outline-primary btn-sm d-block mb-2" %>
+        <% if @tax_type.active? %>
+            <%= button_to "Desactivar", toggle_status_tax_type_path(@tax_type), method: :patch,
+                        class: "btn btn-outline-danger btn-sm w-100", 
+                        data: { confirm: "¿Desactivar '#{@tax_type.name}'?" } %>
+        <% else %>
+            <%= button_to "Activar", toggle_status_tax_type_path(@tax_type), method: :patch,
+                        class: "btn btn-outline-success btn-sm w-100", 
+                        data: { confirm: "¿Activar '#{@tax_type.name}'?" } %>
+        <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: [:show, :edit, :update, :destroy, :toggle_status]
+  before_action :set_product, only: [:show, :edit, :update, :destroy, :toggle_status, :stock_history]
 
   # GET /products
   def index
@@ -25,6 +25,26 @@ class ProductsController < ApplicationController
     
     @categories = Product.active.distinct.pluck(:category).compact.sort
     @low_stock_count = Product.low_stock.count
+  end
+
+  # GET /products/1/stock_history
+  def stock_history
+    @page = params[:page].to_i
+    @page = 1 if @page < 1
+    @per_page = 1
+    
+    # Calcular offset
+    offset = (@page - 1) * @per_page
+    
+    # Obtener historial del producto específico
+    @stock_histories = @product.stock_histories.recent
+    
+    # Contar total para paginación
+    @total_histories = @stock_histories.count
+    @total_pages = (@total_histories.to_f / @per_page).ceil
+    
+    # Aplicar paginación
+    @stock_histories = @stock_histories.limit(@per_page).offset(offset)
   end
 
   # GET /products/1

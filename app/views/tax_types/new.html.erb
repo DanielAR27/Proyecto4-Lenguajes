@@ -1,0 +1,22 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Inicio", root_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Impuestos", tax_types_path %></li>
+          <li class="breadcrumb-item active">Nuevo Tipo de Impuesto</li>
+        </ol>
+      </nav>
+      
+      <div class="d-flex align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="fas fa-plus-circle text-success"></i> 
+          Crear Nuevo Tipo de Impuesto
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <%= render 'form', tax_type: @tax_type %>
+</div>

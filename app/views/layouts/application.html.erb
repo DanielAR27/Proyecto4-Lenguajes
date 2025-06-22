@@ -42,12 +42,12 @@
             <%= link_to products_path, class: "nav-link #{'active' if controller_name == 'products'}" do %>
               <i class="fas fa-box"></i> Productos
             <% end %>
-            <a class="nav-link" href="#">
+            <%= link_to invoices_path, class: "nav-link #{'active' if controller_name == 'invoices'}" do %>
               <i class="fas fa-file-invoice"></i> Facturas
-            </a>
-            <a class="nav-link" href="#">
-              <i class="fas fa-chart-bar"></i> Reportes
-            </a>
+            <% end %>
+            <%= link_to tax_types_path, class: "nav-link #{'active' if controller_name == 'tax_types'}" do %>
+              <i class="fas fa-percentage"></i> Impuestos
+            <% end %>
           </div>
         </div>
       </div>

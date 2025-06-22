@@ -1,0 +1,78 @@
+sistema_facturacion/
+├── app/
+│   ├── controllers/
+│   │   ├── application_controller.rb
+│   │   ├── home_controller.rb
+│   │   ├── products_controller.rb ✓ (CRUD completo + toggle_status + stock_history)
+│   │   ├── invoices_controller.rb ✓ (index básico + filtros)
+│   │   └── tax_types_controller.rb ✓ (CRUD completo + toggle_status)
+│   ├── models/
+│   │   ├── product.rb ✓ (validaciones, scopes, métodos + historial stock)
+│   │   ├── stock_history.rb ✓ (modelo historial)
+│   │   ├── tax_type.rb ✓ (validaciones, scopes, métodos)
+│   │   └── invoice.rb ✓ (modelo básico con numeración)
+│   └── views/
+│       ├── layouts/
+│       │   └── application.html.erb ✓ (navbar actualizado: Productos, Facturas, Impuestos)
+│       ├── home/
+│       │   └── index.html.erb
+│       ├── products/
+│       │   ├── index.html.erb ✓ (tabla + filtros + paginación manual)
+│       │   ├── show.html.erb ✓ (detalles + botones acción + historial)
+│       │   ├── stock_history.html.erb ✓ (historial cambios stock)
+│       │   ├── new.html.erb ✓ (formulario crear)
+│       │   ├── edit.html.erb ✓ (formulario editar)
+│       │   └── _form.html.erb ✓ (parcial formulario)
+│       ├── invoices/
+│       │   └── index.html.erb ✓ (tabla + filtros + botones placeholder)
+│       └── tax_types/
+│           ├── index.html.erb ✓ (tabla + filtros + paginación)
+│           ├── show.html.erb ✓ (detalles + botones acción)
+│           ├── new.html.erb ✓ (formulario crear)
+│           ├── edit.html.erb ✓ (formulario editar)
+│           └── _form.html.erb ✓ (parcial formulario)
+├── config/
+│   ├── routes.rb ✓ (resources completos + toggle_status para products y tax_types)
+│   └── database.yml
+├── db/
+│   ├── migrate/
+│   │   ├── [timestamp]_create_products.rb ✓
+│   │   ├── [timestamp]_create_stock_histories.rb ✓
+│   │   ├── [timestamp]_create_tax_types.rb ✓
+│   │   ├── [timestamp]_create_invoices.rb ✓
+│   │   └── [timestamp]_create_invoice_items.rb ✓
+│   ├── seeds.rb ✓ (tipos de impuestos + productos ejemplo)
+│   └── schema.rb ✓
+└── Gemfile
+
+FUNCIONALIDADES IMPLEMENTADAS:
+✓ CRUD completo de productos
+✓ Activar/Desactivar productos (toggle_status)
+✓ Eliminar productos (hard delete)
+✓ Historial de cambios de stock automático
+✓ Validaciones del modelo
+✓ Filtros por nombre y categoría
+✓ Paginación manual (10 productos por página)
+✓ Alertas de stock bajo
+✓ Confirmaciones con onclick
+✓ Interfaz Bootstrap responsiva
+✓ Navbar con navegación completa
+
+✓ CRUD completo de tipos de impuestos
+✓ Activar/Desactivar tipos de impuestos
+✓ Configuración de tasas (IVA, Exento, etc.)
+✓ Validaciones y scopes
+✓ Filtros por nombre
+✓ Paginación manual
+
+✓ Vista index de facturas (básico)
+✓ Filtros por cliente y número de factura
+✓ Estructura de base de datos completa
+
+PENDIENTE:
+- Formulario de crear facturas (con productos + impuestos)
+- Cálculo automático de totales
+- Generación de PDF
+- Vista show/edit de facturas
+- Relaciones entre modelos (cuando esté InvoiceItem)
+- Reportes

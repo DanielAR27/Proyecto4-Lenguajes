@@ -1,4 +1,8 @@
 class Product < ApplicationRecord
+  # Relaciones
+  has_many :stock_histories, dependent: :destroy
+  # has_many :invoice_items, dependent: :restrict_with_error
+  
   # Validaciones
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
   validates :code, presence: true, uniqueness: true, length: { minimum: 3, maximum: 20 }
@@ -15,6 +19,7 @@ class Product < ApplicationRecord
   # Callbacks
   before_validation :generate_code, if: :new_record?
   before_validation :normalize_name
+  after_update :record_stock_change, if: :saved_change_to_stock?
 
   # Métodos de instancia
   def low_stock?
@@ -59,5 +64,18 @@ class Product < ApplicationRecord
 
   def normalize_name
     self.name = name.to_s.strip.titleize if name.present?
+  end
+  
+  def record_stock_change
+    # Solo registrar si realmente cambió el stock
+    old_stock_value = saved_change_to_stock[0] # Valor anterior
+    new_stock_value = saved_change_to_stock[1] # Valor nuevo
+    
+    if old_stock_value != new_stock_value
+      stock_histories.create!(
+        old_stock: old_stock_value,
+        new_stock: new_stock_value
+      )
+    end
   end
 end

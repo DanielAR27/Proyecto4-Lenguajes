@@ -82,7 +82,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td><strong>Valor Total:</strong></td>
+                  <td><strong>Valor en Inventario:</strong></td>
                   <td><strong class="text-info">₡<%= number_with_delimiter(@product.total_value.to_f.round(2)) %></strong></td>
                 </tr>
               </table>
@@ -146,6 +146,8 @@
                     onclick: "return confirm('¿Eliminar permanentemente #{@product.name}? Esta acción no se puede deshacer.')" %>
         <%= link_to "Todos los Productos", products_path, 
                     class: "btn btn-outline-primary btn-sm d-block mb-2" %>
+        <%= link_to "Historial de Stock", stock_history_product_path(@product), 
+                    class: "btn btn-outline-secondary btn-sm d-block mb-2" %>
         <% if @product.active? %>
             <%= button_to "Desactivar", toggle_status_product_path(@product), method: :patch,
                         class: "btn btn-outline-danger btn-sm w-100", 

@@ -1,0 +1,125 @@
+<%= form_with(model: tax_type, local: true, class: "needs-validation", novalidate: true) do |form| %>
+  <% if tax_type.errors.any? %>
+    <div class="alert alert-danger">
+      <h6><i class="fas fa-exclamation-triangle"></i> Se encontraron <%= tax_type.errors.count %> errores:</h6>
+      <ul class="mb-0">
+        <% tax_type.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <!-- Información del impuesto -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-percentage"></i> Información del Impuesto</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="mb-3">
+                <%= form.label :name, "Nombre del Impuesto *", class: "form-label" %>
+                <%= form.text_field :name, class: "form-control #{'is-invalid' if tax_type.errors[:name].any?}", 
+                                   placeholder: "Ej: IVA, Exento, Impuesto Selectivo", required: true %>
+                <div class="invalid-feedback">
+                  <%= tax_type.errors[:name].first if tax_type.errors[:name].any? %>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <%= form.label :percentage, "Porcentaje *", class: "form-label" %>
+                <div class="input-group">
+                  <%= form.number_field :percentage, step: 0.0001, min: 0, max: 0.9999,
+                                       class: "form-control #{'is-invalid' if tax_type.errors[:percentage].any?}", 
+                                       placeholder: "0.1300", required: true %>
+                  <span class="input-group-text">%</span>
+                  <div class="invalid-feedback">
+                    <%= tax_type.errors[:percentage].first if tax_type.errors[:percentage].any? %>
+                  </div>
+                </div>
+                <div class="form-text">Ingresa el valor decimal. Ej: 0.13 para 13%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuración -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-cog"></i> Configuración</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <%= form.check_box :active, class: "form-check-input" %>
+              <%= form.label :active, "Impuesto Activo", class: "form-check-label" %>
+            </div>
+            <div class="form-text">Los impuestos inactivos no aparecen en facturación</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejemplos (solo en edición) -->
+      <% unless tax_type.new_record? %>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-calculator"></i> Vista Previa</h6>
+          </div>
+          <div class="card-body">
+            <p class="mb-1">
+              <strong>Formato:</strong><br>
+              <span class="text-success"><%= tax_type.formatted_name %></span>
+            </p>
+            <p class="mb-0">
+              <strong>Aplicado a ₡1000:</strong><br>
+              <small class="text-muted">₡<%= (1000 * tax_type.percentage).round(2) %></small>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between">
+        <%= link_to "Cancelar", tax_types_path, class: "btn btn-secondary" %>
+        
+        <div>
+          <% unless tax_type.new_record? %>
+            <%= link_to "Ver Impuesto", tax_type, class: "btn btn-outline-info me-2" %>
+          <% end %>
+          <%= form.submit tax_type.new_record? ? "Crear Tipo de Impuesto" : "Actualizar Tipo de Impuesto", 
+                         class: "btn btn-success" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script>
+// Validación de Bootstrap
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
