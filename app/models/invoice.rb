@@ -85,6 +85,10 @@ class Invoice < ApplicationRecord
     false
   end
   
+  def can_be_deleted?
+    anulada?
+  end
+
   private
   
   def generate_invoice_number

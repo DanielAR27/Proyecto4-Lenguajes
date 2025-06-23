@@ -129,6 +129,20 @@
 
     <!-- Panel lateral -->
     <div class="col-md-4">
+      <!-- Alertas según estado -->
+      <% if @invoice.anulada? %>
+        <div class="alert alert-danger mt-3">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Factura Anulada</strong><br>
+          Esta factura ha sido anulada y el stock ha sido restaurado.
+        </div>
+      <% elsif @invoice.emitida? %>
+        <div class="alert alert-info mt-3">
+          <i class="fas fa-info-circle"></i>
+          <strong>Pendiente de Pago</strong><br>
+          Esta factura está emitida pero aún no ha sido pagada.
+        </div>
+      <% end %>
       <!-- Información adicional -->
       <div class="card">
         <div class="card-header">
@@ -197,21 +211,6 @@
           <% end %>
         </div>
       </div>
-
-      <!-- Alertas según estado -->
-      <% if @invoice.anulada? %>
-        <div class="alert alert-danger mt-3">
-          <i class="fas fa-exclamation-triangle"></i>
-          <strong>Factura Anulada</strong><br>
-          Esta factura ha sido anulada y el stock ha sido restaurado.
-        </div>
-      <% elsif @invoice.emitida? %>
-        <div class="alert alert-info mt-3">
-          <i class="fas fa-info-circle"></i>
-          <strong>Pendiente de Pago</strong><br>
-          Esta factura está emitida pero aún no ha sido pagada.
-        </div>
-      <% end %>
     </div>
   </div>
 </div>

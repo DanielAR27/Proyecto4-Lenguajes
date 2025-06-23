@@ -18,4 +18,12 @@ class TaxType < ApplicationRecord
   def formatted_name
     "#{name} (#{percentage_text})"
   end
+
+  def can_be_deleted?
+    invoice_items.empty?
+  end
+
+  def invoices_count
+    invoice_items.joins(:invoice).distinct.count('invoices.id')
+  end
 end

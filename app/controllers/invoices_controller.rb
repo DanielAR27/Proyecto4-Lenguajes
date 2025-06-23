@@ -82,9 +82,15 @@ class InvoicesController < ApplicationController
   end
 
   def destroy
-    if @invoice.cancel_and_restore_stock!
-      @invoice.destroy
-      redirect_to invoices_url, notice: 'Factura eliminada y stock restaurado exitosamente.'
+    # Si la factura no está anulada, primero la anulamos para restaurar stock
+    if !@invoice.anulada? && !@invoice.cancel_and_restore_stock!
+      redirect_to @invoice, alert: 'No se pudo anular la factura antes de eliminarla.'
+      return
+    end
+    
+    # Una vez anulada (o si ya estaba anulada), eliminar la factura
+    if @invoice.destroy
+      redirect_to invoices_url, notice: 'Factura eliminada exitosamente.'
     else
       redirect_to @invoice, alert: 'No se pudo eliminar la factura.'
     end

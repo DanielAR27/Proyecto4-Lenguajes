@@ -52,6 +52,14 @@ class Product < ApplicationRecord
     active? && stock >= quantity
   end
 
+  def can_be_deleted?
+    invoice_items.empty?
+  end
+
+  def invoices_count
+    invoice_items.joins(:invoice).distinct.count('invoices.id')
+  end
+
   private
 
   def generate_code

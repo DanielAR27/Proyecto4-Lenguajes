@@ -76,11 +76,19 @@
                                     title: "Editar" do %>
                         <i class="fas fa-edit"></i>
                         <% end %>
+                        <% if tax_type.can_be_deleted? %>
                         <%= button_to tax_type_path(tax_type), method: :delete,
-                                    class: "btn btn-sm btn-outline-danger", 
-                                    title: "Eliminar",
-                                    onclick: "return confirm('¿Eliminar permanentemente #{tax_type.name}? Esta acción no se puede deshacer.')" do %>
-                        <i class="fas fa-trash"></i>
+                                        class: "btn btn-sm btn-outline-danger", 
+                                        title: "Eliminar",
+                                        data: { confirm: "¿Eliminar permanentemente #{tax_type.name}? Esta acción no se puede deshacer." } do %>
+                            <i class="fas fa-trash"></i>
+                        <% end %>
+                        <% else %>
+                        <button class="btn btn-sm btn-outline-danger disabled" 
+                                title="No se puede eliminar: está siendo usado en <%= tax_type.invoices_count %> factura(s)"
+                                disabled>
+                            <i class="fas fa-trash"></i>
+                        </button>
                         <% end %>
                     </div>
                     </td>

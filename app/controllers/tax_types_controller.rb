@@ -58,8 +58,15 @@ class TaxTypesController < ApplicationController
 
   # DELETE /tax_types/1
   def destroy
-    @tax_type.destroy
-    redirect_to tax_types_url, notice: 'Tipo de impuesto eliminado exitosamente.'
+    begin
+      @tax_type.destroy!
+      redirect_to tax_types_url, notice: 'Tipo de impuesto eliminado exitosamente.'
+    rescue ActiveRecord::DeleteRestrictionError
+      redirect_to @tax_type, alert: 'No se puede eliminar este tipo de impuesto porque está siendo usado en una o más facturas.'
+    rescue => e
+      Rails.logger.error "Error al eliminar tipo de impuesto #{@tax_type.id}: #{e.message}"
+      redirect_to @tax_type, alert: 'No se pudo eliminar el tipo de impuesto. Intente nuevamente.'
+    end
   end
 
   # PATCH /tax_types/1/toggle_status

@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (requestedQuantity > availableStock) {
         quantityInput.setCustomValidity(`Solo hay ${availableStock} unidades disponibles`);
-        stockInfo.textContent = `⚠️ Solo ${availableStock} disponibles`;
+        stockInfo.textContent = `☓ Solo ${availableStock} disponibles`;
         stockInfo.className = 'stock-info text-danger';
       } else {
         quantityInput.setCustomValidity('');

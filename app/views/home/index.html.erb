@@ -1,33 +1,156 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h1 class="text-center mb-0">
-            <%= @mensaje %>
-          </h1>
+<div class="container mt-4">
+  <!-- Encabezado del Dashboard -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="display-6">
+          <i class="fas fa-tachometer-alt text-primary"></i> 
+          Dashboard del Sistema
+        </h1>
+        <div class="text-muted">
+          <i class="fas fa-calendar-alt"></i> 
+          Fecha: <%= Date.current.strftime("%d de #{I18n.t('date.month_names')[Date.current.month]} de %Y") %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjetas de estadísticas principales -->
+  <div class="row mb-4">
+    <!-- Productos -->
+    <div class="col-md-3">
+      <div class="card border-primary h-100">
+        <div class="card-body text-center d-flex flex-column">
+          <i class="fas fa-box fa-2x text-primary mb-3"></i>
+          <h5 class="card-title">Productos</h5>
+          <h3 class="text-primary"><%= @total_products %></h3>
+          <div class="small text-muted mt-auto">
+            <%= @active_products %> activos
+            <% if @low_stock_products > 0 %>
+              <br><span class="text-warning"> <%= @low_stock_products %> con stock bajo</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facturas -->
+    <div class="col-md-3">
+      <div class="card border-success h-100">
+        <div class="card-body text-center d-flex flex-column">
+          <i class="fas fa-file-invoice fa-2x text-success mb-3"></i>
+          <h5 class="card-title">Facturas</h5>
+          <h3 class="text-success"><%= @total_invoices %></h3>
+          <div class="small text-muted mt-auto">
+            <%= @invoices_emitidas %> emitidas<br>
+            <%= @invoices_pagadas %> pagadas<br>
+            <%= @invoices_anuladas %> anuladas
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ventas totales -->
+    <div class="col-md-3">
+      <div class="card border-info h-100">
+        <div class="card-body text-center d-flex flex-column">
+          <i class="fas fa-dollar-sign fa-2x text-info mb-3"></i>
+          <h5 class="card-title">Ventas Totales</h5>
+          <h3 class="text-info">₡<%= number_with_delimiter(@total_sales.to_f.round(0)) %></h3>
+          <div class="small text-muted mt-auto">
+            Este mes: ₡<%= number_with_delimiter(@sales_this_month.to_f.round(0)) %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventario -->
+    <div class="col-md-3">
+      <div class="card border-warning h-100">
+        <div class="card-body text-center d-flex flex-column">
+          <i class="fas fa-warehouse fa-2x text-warning mb-3"></i>
+          <h5 class="card-title">Inventario</h5>
+          <h3 class="text-warning">₡<%= number_with_delimiter(@inventory_value.to_f.round(0)) %></h3>
+          <div class="small text-muted mt-auto">
+            Valor total en stock
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección inferior -->
+  <div class="row">
+    <!-- Productos más vendidos -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">
+            <i class="fas fa-trophy text-warning"></i> 
+            Top 5 Productos Más Vendidos
+          </h6>
+          <%= link_to "Ver productos", products_path, class: "btn btn-sm btn-outline-primary" %>
         </div>
         <div class="card-body">
-          <p class="lead text-center">
-            <%= @descripcion %>
-          </p>
-          
-          <hr>
-          
-          <h3>Características del Proyecto:</h3>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">✅ Gestión de Inventario</li>
-            <li class="list-group-item">✅ Sistema de Facturación</li>
-            <li class="list-group-item">✅ Cálculo automático de impuestos</li>
-            <li class="list-group-item">✅ Generación de PDF</li>
-            <li class="list-group-item">✅ Reportes de ventas y stock</li>
-          </ul>
-          
-          <div class="text-center mt-4">
-            <p class="text-muted">
-              Proyecto desarrollado con Ruby on Rails <%= Rails.version %>
-            </p>
-          </div>
+          <% if @top_products.any? %>
+            <% @top_products.each_with_index do |(product_name, quantity), index| %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <span class="badge bg-<%= index == 0 ? 'warning' : 'secondary' %> me-2">
+                    #<%= index + 1 %>
+                  </span>
+                  <%= product_name %>
+                </div>
+                <span class="text-muted"><%= quantity %> vendidos</span>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center text-muted py-3">
+              <i class="fas fa-chart-line fa-2x mb-2"></i>
+              <p>No hay datos de ventas aún</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facturas recientes -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">
+            <i class="fas fa-clock text-info"></i> 
+            Top 5 Facturas Recientes
+          </h6>
+          <%= link_to "Ver facturas", invoices_path, class: "btn btn-sm btn-outline-primary" %>
+        </div>
+        <div class="card-body">
+          <% if @recent_invoices.any? %>
+            <% @recent_invoices.each do |invoice| %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <strong><%= invoice.invoice_number %></strong><br>
+                  <small class="text-muted"><%= invoice.client_name %></small>
+                </div>
+                <div class="text-end">
+                  <span class="badge bg-<%= 
+                    case invoice.status
+                    when 'emitida' then 'primary'
+                    when 'pagada' then 'success'
+                    when 'anulada' then 'danger'
+                    end
+                  %>"><%= invoice.status.capitalize %></span><br>
+                  <small class="text-muted">₡<%= number_with_delimiter(invoice.total.to_f.round(0)) %></small>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center text-muted py-3">
+              <i class="fas fa-file-invoice fa-2x mb-2"></i>
+              <p>No hay facturas aún</p>
+              <%= link_to "Crear primera factura", new_invoice_path, class: "btn btn-primary btn-sm" %>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

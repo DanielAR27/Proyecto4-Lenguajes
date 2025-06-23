@@ -114,7 +114,13 @@
           Este producto no tiene unidades disponibles.
         </div>
       <% end %>
-
+      <% unless @product.can_be_deleted? %>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>No se puede eliminar</strong><br>
+          Este producto está siendo usado en <%= @product.invoices_count %> factura(s).
+        </div>
+      <% end %>
       <!-- Información adicional -->
       <div class="card">
         <div class="card-header">
@@ -140,10 +146,16 @@
         <div class="card-body">
         <%= link_to "Editar Producto", edit_product_path(@product), 
                     class: "btn btn-warning btn-sm d-block mb-2" %>
-        <%= button_to "Eliminar Producto", product_path(@product), method: :delete,
-                    class: "btn btn-danger btn-sm mb-2", 
-                    style: "width: 100%; border: none;",
-                    onclick: "return confirm('¿Eliminar permanentemente #{@product.name}? Esta acción no se puede deshacer.')" %>
+        <% if @product.can_be_deleted? %>
+          <%= button_to "Eliminar Producto", product_path(@product), method: :delete,
+                      class: "btn btn-danger btn-sm mb-2", 
+                      style: "width: 100%; border: none;",
+                      data: { confirm: "¿Eliminar permanentemente #{@product.name}? Esta acción no se puede deshacer." } %>
+        <% else %>
+          <button class="btn btn-danger btn-sm mb-2 disabled" style="width: 100%;" disabled title="No se puede eliminar porque está en uso">
+            Eliminar Producto
+          </button>
+        <% end %>
         <%= link_to "Todos los Productos", products_path, 
                     class: "btn btn-outline-primary btn-sm d-block mb-2" %>
         <%= link_to "Historial de Stock", stock_history_product_path(@product), 

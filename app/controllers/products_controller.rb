@@ -82,8 +82,15 @@ class ProductsController < ApplicationController
 
   # DELETE /products/1
   def destroy
-    @product.destroy
-    redirect_to products_url,  notice: 'Se ha borrado el producto exitosamente.'
+    begin
+      @product.destroy!
+      redirect_to products_url, notice: 'Producto eliminado exitosamente.'
+    rescue ActiveRecord::DeleteRestrictionError
+      redirect_to @product, alert: 'No se puede eliminar este producto porque está siendo usado en una o más facturas.'
+    rescue => e
+      Rails.logger.error "Error al eliminar producto #{@product.id}: #{e.message}"
+      redirect_to @product, alert: 'No se pudo eliminar el producto. Intente nuevamente.'
+    end
   end
 
   # GET /products/low_stock
