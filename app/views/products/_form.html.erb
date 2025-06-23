@@ -1,6 +1,7 @@
 <%= form_with(model: product, local: true, class: "needs-validation", novalidate: true) do |form| %>
   <% if product.errors.any? %>
-    <div class="alert alert-danger">
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       <h6><i class="fas fa-exclamation-triangle"></i> Se encontraron <%= product.errors.count %> errores:</h6>
       <ul class="mb-0">
         <% product.errors.full_messages.each do |message| %>
@@ -31,13 +32,10 @@
             </div>
             <div class="col-md-4">
               <div class="mb-3">
-                <%= form.label :code, "Código *", class: "form-label" %>
-                <%= form.text_field :code, class: "form-control #{'is-invalid' if product.errors[:code].any?}", 
-                                   placeholder: "LAPTOP001", required: true %>
+                <%= form.label :code, "Código", class: "form-label" %>
+                <%= form.text_field :code, class: "form-control", 
+                                  placeholder: "LAPTOP001" %>
                 <div class="form-text">Si se deja vacío, se generará automáticamente</div>
-                <div class="invalid-feedback">
-                  <%= product.errors[:code].first if product.errors[:code].any? %>
-                </div>
               </div>
             </div>
           </div>

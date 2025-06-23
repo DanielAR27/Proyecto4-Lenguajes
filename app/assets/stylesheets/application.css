@@ -1,3 +1,13 @@
 .btn:focus {
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5) !important;
 }
+
+.alert-danger {
+  position: relative;
+}
+
+.alert-danger .btn-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}

@@ -3,10 +3,9 @@ class Product < ApplicationRecord
   has_many :stock_histories, dependent: :destroy
   has_many :invoice_items, dependent: :restrict_with_error
   
-  # ... resto del código igual que tienes
-  # Validaciones
+  # Validaciones - UNICIDAD CORREGIDA
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
-  validates :code, presence: true, uniqueness: true, length: { minimum: 3, maximum: 20 }
+  validates :code, presence: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 20 }, unless: :code_will_be_generated?
   validates :price, presence: true, numericality: { greater_than: 0 }
   validates :stock, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :min_stock, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -19,7 +18,7 @@ class Product < ApplicationRecord
   scope :available_for_sale, -> { active.where('stock > 0') }
 
   # Callbacks
-  before_validation :generate_code, if: :new_record?
+  before_validation :generate_code_if_needed
   before_validation :normalize_name
   after_update :record_stock_change, if: :saved_change_to_stock?
 
@@ -62,11 +61,24 @@ class Product < ApplicationRecord
 
   private
 
+  # Método para validación condicional
+  def code_will_be_generated?
+    new_record? && (code.blank? || code.strip.empty?)
+  end
+
+  def generate_code_if_needed
+    # Generar código si está vacío, en blanco, o es solo espacios
+    if code.blank? || code.strip.empty?
+      generate_code
+    end
+  end
+
   def generate_code
-    return if code.present?
+    return if name.blank? # No generar si no hay nombre
     
     # Generar código basado en el nombre si no se proporciona
     base_code = name.to_s.upcase.gsub(/[^A-Z0-9]/, '')[0..5]
+    base_code = "PROD" if base_code.empty? # Fallback si el nombre no tiene caracteres válidos
     counter = 1
     
     loop do
