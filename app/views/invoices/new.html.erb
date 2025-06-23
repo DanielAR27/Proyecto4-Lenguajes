@@ -1,0 +1,382 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Inicio", root_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Facturas", invoices_path %></li>
+          <li class="breadcrumb-item active">Nueva Factura</li>
+        </ol>
+      </nav>
+      
+      <div class="d-flex align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="fas fa-plus-circle text-success"></i> 
+          Crear Nueva Factura
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with model: @invoice, local: true, id: "invoice-form", class: "needs-validation", novalidate: true do |form| %>
+    <% if @invoice.errors.any? %>
+      <div class="alert alert-danger">
+        <h6><i class="fas fa-exclamation-triangle"></i> Se encontraron <%= @invoice.errors.count %> errores:</h6>
+        <ul class="mb-0">
+          <% @invoice.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="row">
+      <!-- Información del Cliente -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-user"></i> Información del Cliente</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <%= form.label :client_name, "Nombre del Cliente *", class: "form-label" %>
+              <%= form.text_field :client_name, class: "form-control #{'is-invalid' if @invoice.errors[:client_name].any?}", 
+                                 placeholder: "Ej: Juan Pérez", required: true %>
+              <div class="invalid-feedback">
+                <%= @invoice.errors[:client_name].first if @invoice.errors[:client_name].any? %>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :client_email, "Email del Cliente", class: "form-label" %>
+              <%= form.email_field :client_email, class: "form-control", 
+                                  placeholder: "cliente@ejemplo.com" %>
+              <div class="form-text">Opcional - para envío de factura por correo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen (se llenará dinámicamente) -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-calculator"></i> Resumen de Factura</h5>
+          </div>
+          <div class="card-body">
+            <table class="table table-sm">
+              <tr>
+                <td><strong>Subtotal:</strong></td>
+                <td class="text-end"><span id="subtotal-display">₡0.00</span></td>
+              </tr>
+              <tr>
+                <td><strong>Impuestos:</strong></td>
+                <td class="text-end"><span id="tax-display">₡0.00</span></td>
+              </tr>
+              <tr class="table-success">
+                <td><strong>Total:</strong></td>
+                <td class="text-end"><strong><span id="total-display">₡0.00</span></strong></td>
+              </tr>
+            </table>
+            
+            <div class="mt-3">
+              <small class="text-muted">
+                <i class="fas fa-info-circle"></i> 
+                Los totales se calculan automáticamente
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Productos -->
+    <div class="card mt-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-box"></i> Productos</h5>
+        <button type="button" id="add-item" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-plus"></i> Agregar Producto
+        </button>
+      </div>
+      <div class="card-body">
+        <div id="items-container">
+          <!-- Los items se agregan dinámicamente aquí -->
+        </div>
+        
+        <div class="text-center" id="no-items-message">
+          <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+          <p class="text-muted">No hay productos agregados. Haz clic en "Agregar Producto" para comenzar.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between">
+          <%= link_to "Cancelar", invoices_path, class: "btn btn-secondary" %>
+          <%= form.submit "Crear Factura", class: "btn btn-success", id: "submit-button" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Template para nuevos items (oculto) -->
+<template id="item-template">
+  <div class="item-row border p-3 mb-3 rounded position-relative">
+    <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 remove-item">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="row">
+      <div class="col-md-4">
+        <label class="form-label">Producto *</label>
+        <select name="items[][product_id]" class="form-select product-select" required>
+          <option value="">Seleccionar producto...</option>
+          <% @products.each do |product| %>
+            <option value="<%= product.id %>" 
+                    data-price="<%= product.price %>" 
+                    data-stock="<%= product.stock %>"
+                    data-name="<%= product.name %>">
+              <%= product.name %> - <%= product.formatted_price %> (Stock: <%= product.stock %>)
+            </option>
+          <% end %>
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label class="form-label">Cantidad *</label>
+        <input type="number" name="items[][quantity]" class="form-control quantity-input" 
+               min="1" required placeholder="1">
+        <div class="form-text">
+          <small class="stock-info text-muted"></small>
+        </div>
+      </div>
+      
+      <div class="col-md-3">
+        <label class="form-label">Tipo de Impuesto *</label>
+        <select name="items[][tax_type_id]" class="form-select tax-select" required>
+          <option value="">Seleccionar impuesto...</option>
+          <% @tax_types.each do |tax_type| %>
+            <option value="<%= tax_type.id %>" data-percentage="<%= tax_type.percentage %>">
+              <%= tax_type.formatted_name %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label class="form-label">Total Línea</label>
+        <div class="form-control-plaintext">
+          <strong class="line-total">₡0.00</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let itemCount = 0;
+  const itemsContainer = document.getElementById('items-container');
+  const noItemsMessage = document.getElementById('no-items-message');
+  const addItemBtn = document.getElementById('add-item');
+  const template = document.getElementById('item-template');
+
+  // Agregar nuevo item
+  addItemBtn.addEventListener('click', function() {
+    const newItem = template.content.cloneNode(true);
+    
+    // Agregar al contenedor
+    itemsContainer.appendChild(newItem);
+    itemCount++;
+    
+    // Ocultar mensaje de "no items"
+    noItemsMessage.style.display = 'none';
+    
+    // Agregar event listeners al nuevo item
+    attachItemListeners();
+    
+    // Actualizar disponibilidad de productos
+    updateProductAvailability();
+  });
+
+  // Remover item
+  function attachItemListeners() {
+    // Remover listeners anteriores para evitar duplicados
+    document.querySelectorAll('.remove-item').forEach(button => {
+      button.replaceWith(button.cloneNode(true));
+    });
+    
+    document.querySelectorAll('.remove-item').forEach(button => {
+      button.addEventListener('click', function() {
+        this.closest('.item-row').remove();
+        itemCount--;
+        
+        if (itemCount === 0) {
+          noItemsMessage.style.display = 'block';
+        }
+        
+        // Actualizar disponibilidad de productos al remover
+        setTimeout(() => {
+          updateProductAvailability();
+          calculateTotals();
+        }, 100);
+      });
+    });
+
+    // Listeners para cálculos - solo en elementos nuevos
+    const lastRow = itemsContainer.lastElementChild;
+    if (lastRow && lastRow.classList.contains('item-row')) {
+      const selects = lastRow.querySelectorAll('.product-select, .quantity-input, .tax-select');
+      
+      selects.forEach(element => {
+        element.addEventListener('change', function() {
+          if (this.classList.contains('product-select')) {
+            updateProductAvailability();
+          }
+          updateLineTotal(this.closest('.item-row'));
+          calculateTotals();
+        });
+        
+        element.addEventListener('input', function() {
+          updateLineTotal(this.closest('.item-row'));
+          calculateTotals();
+        });
+      });
+
+      // Validar stock al cambiar producto o cantidad
+      const productAndQuantity = lastRow.querySelectorAll('.product-select, .quantity-input');
+      productAndQuantity.forEach(element => {
+        element.addEventListener('change', validateStock);
+        element.addEventListener('input', validateStock);
+      });
+    }
+  }
+
+  // Validar stock disponible
+  function validateStock() {
+    const row = this.closest('.item-row');
+    const productSelect = row.querySelector('.product-select');
+    const quantityInput = row.querySelector('.quantity-input');
+    const stockInfo = row.querySelector('.stock-info');
+    
+    if (productSelect.value && quantityInput.value) {
+      const selectedOption = productSelect.selectedOptions[0];
+      const availableStock = parseInt(selectedOption.dataset.stock);
+      const requestedQuantity = parseInt(quantityInput.value);
+      
+      if (requestedQuantity > availableStock) {
+        quantityInput.setCustomValidity(`Solo hay ${availableStock} unidades disponibles`);
+        stockInfo.textContent = `⚠️ Solo ${availableStock} disponibles`;
+        stockInfo.className = 'stock-info text-danger';
+      } else {
+        quantityInput.setCustomValidity('');
+        stockInfo.textContent = `✓ ${availableStock} disponibles`;
+        stockInfo.className = 'stock-info text-success';
+      }
+    }
+  }
+
+  // Actualizar disponibilidad de productos (prevenir duplicados)
+  function updateProductAvailability() {
+    const selectedProducts = [];
+    
+    // Recopilar productos ya seleccionados
+    document.querySelectorAll('.product-select').forEach(select => {
+      if (select.value) {
+        selectedProducts.push(select.value);
+      }
+    });
+    
+    // Actualizar todas las listas de productos
+    document.querySelectorAll('.product-select').forEach(currentSelect => {
+      const currentValue = currentSelect.value;
+      
+      currentSelect.querySelectorAll('option').forEach(option => {
+        if (option.value === '') return; // Skip placeholder
+        
+        // Deshabilitar si está seleccionado en otro dropdown
+        const isSelectedElsewhere = selectedProducts.includes(option.value) && option.value !== currentValue;
+        
+        option.disabled = isSelectedElsewhere;
+        
+        // Agregar indicador visual
+        if (isSelectedElsewhere) {
+          option.textContent = option.textContent.replace(' (Ya agregado)', '') + ' (Ya agregado)';
+        } else {
+          option.textContent = option.textContent.replace(' (Ya agregado)', '');
+        }
+      });
+    });
+  }
+
+  // Calcular total de línea
+  function updateLineTotal(row) {
+    const productSelect = row.querySelector('.product-select');
+    const quantityInput = row.querySelector('.quantity-input');
+    const taxSelect = row.querySelector('.tax-select');
+    const lineTotalDisplay = row.querySelector('.line-total');
+    
+    if (productSelect.value && quantityInput.value && taxSelect.value) {
+      const price = parseFloat(productSelect.selectedOptions[0].dataset.price);
+      const quantity = parseInt(quantityInput.value);
+      const taxPercentage = parseFloat(taxSelect.selectedOptions[0].dataset.percentage);
+      
+      const subtotal = price * quantity;
+      const taxAmount = subtotal * taxPercentage;
+      const total = subtotal + taxAmount;
+      
+      lineTotalDisplay.textContent = `₡${total.toLocaleString('es-CR', {minimumFractionDigits: 2})}`;
+    } else {
+      lineTotalDisplay.textContent = '₡0.00';
+    }
+  }
+
+  // Calcular totales generales
+  function calculateTotals() {
+    let subtotal = 0;
+    let taxAmount = 0;
+    
+    document.querySelectorAll('.item-row').forEach(row => {
+      const productSelect = row.querySelector('.product-select');
+      const quantityInput = row.querySelector('.quantity-input');
+      const taxSelect = row.querySelector('.tax-select');
+      
+      if (productSelect.value && quantityInput.value && taxSelect.value) {
+        const price = parseFloat(productSelect.selectedOptions[0].dataset.price);
+        const quantity = parseInt(quantityInput.value);
+        const taxPercentage = parseFloat(taxSelect.selectedOptions[0].dataset.percentage);
+        
+        const lineSubtotal = price * quantity;
+        const lineTaxAmount = lineSubtotal * taxPercentage;
+        
+        subtotal += lineSubtotal;
+        taxAmount += lineTaxAmount;
+      }
+    });
+    
+    const total = subtotal + taxAmount;
+    
+    document.getElementById('subtotal-display').textContent = `₡${subtotal.toLocaleString('es-CR', {minimumFractionDigits: 2})}`;
+    document.getElementById('tax-display').textContent = `₡${taxAmount.toLocaleString('es-CR', {minimumFractionDigits: 2})}`;
+    document.getElementById('total-display').textContent = `₡${total.toLocaleString('es-CR', {minimumFractionDigits: 2})}`;
+  }
+
+  // Validación del formulario
+  document.getElementById('invoice-form').addEventListener('submit', function(e) {
+    if (itemCount === 0) {
+      e.preventDefault();
+      alert('Debe agregar al menos un producto a la factura.');
+      return false;
+    }
+  });
+
+  // Agregar primer item automáticamente
+  addItemBtn.click();
+  
+  // Actualizar disponibilidad inicial
+  updateProductAvailability();
+});
+</script>

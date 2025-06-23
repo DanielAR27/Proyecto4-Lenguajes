@@ -1,6 +1,6 @@
 class TaxType < ApplicationRecord
   # Relaciones
-  # has_many :invoice_items, dependent: :restrict_with_error
+  has_many :invoice_items, dependent: :restrict_with_error
   
   # Validaciones
   validates :name, presence: true, uniqueness: true, length: { minimum: 2, maximum: 50 }

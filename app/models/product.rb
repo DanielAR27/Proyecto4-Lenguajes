@@ -1,8 +1,9 @@
 class Product < ApplicationRecord
   # Relaciones
   has_many :stock_histories, dependent: :destroy
-  # has_many :invoice_items, dependent: :restrict_with_error
+  has_many :invoice_items, dependent: :restrict_with_error
   
+  # ... resto del código igual que tienes
   # Validaciones
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
   validates :code, presence: true, uniqueness: true, length: { minimum: 3, maximum: 20 }
@@ -15,6 +16,7 @@ class Product < ApplicationRecord
   scope :inactive, -> { where(active: false) }
   scope :low_stock, -> { where('stock <= min_stock') }
   scope :by_category, ->(category) { where(category: category) }
+  scope :available_for_sale, -> { active.where('stock > 0') }
 
   # Callbacks
   before_validation :generate_code, if: :new_record?
@@ -44,6 +46,10 @@ class Product < ApplicationRecord
 
   def total_value
     price * stock
+  end
+  
+  def can_sell?(quantity)
+    active? && stock >= quantity
   end
 
   private

@@ -5,7 +5,7 @@ class ProductsController < ApplicationController
   def index
     @page = params[:page].to_i
     @page = 1 if @page < 1
-    @per_page = 1
+    @per_page = 5
     
     # Calcular offset
     offset = (@page - 1) * @per_page
@@ -31,7 +31,7 @@ class ProductsController < ApplicationController
   def stock_history
     @page = params[:page].to_i
     @page = 1 if @page < 1
-    @per_page = 1
+    @per_page = 5
     
     # Calcular offset
     offset = (@page - 1) * @per_page

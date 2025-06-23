@@ -11,8 +11,13 @@ Rails.application.routes.draw do
     end
   end
   
-  # Solo index y new por ahora
-  resources :invoices, only: [:index, :new, :create]
+  # CRUD completo de facturas con acciones especiales
+  resources :invoices do
+    member do
+      patch :mark_as_paid
+      patch :cancel
+    end
+  end
   
   # CRUD básico de tipos de impuestos
   resources :tax_types do

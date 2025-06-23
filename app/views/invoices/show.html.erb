@@ -1,0 +1,217 @@
+<!-- app/views/invoices/show.html.erb -->
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Inicio", root_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Facturas", invoices_path %></li>
+          <li class="breadcrumb-item active"><%= @invoice.invoice_number %></li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Información principal -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">
+            <i class="fas fa-file-invoice"></i> Factura <%= @invoice.invoice_number %>
+            <% case @invoice.status %>
+            <% when 'emitida' %>
+              <span class="badge bg-primary ms-2">Emitida</span>
+            <% when 'pagada' %>
+              <span class="badge bg-success ms-2">Pagada</span>
+            <% when 'anulada' %>
+              <span class="badge bg-danger ms-2">Anulada</span>
+            <% end %>
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Información del Cliente</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>Nombre:</strong></td>
+                  <td><%= @invoice.client_name %></td>
+                </tr>
+                <tr>
+                  <td><strong>Email:</strong></td>
+                  <td>
+                    <% if @invoice.client_email.present? %>
+                      <%= @invoice.client_email %>
+                    <% else %>
+                      <span class="text-muted">No especificado</span>
+                    <% end %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Fecha de Emisión:</strong></td>
+                  <td><%= @invoice.issue_date.strftime("%d/%m/%Y") %></td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Totales</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>Subtotal:</strong></td>
+                  <td><%= @invoice.formatted_subtotal %></td>
+                </tr>
+                <tr>
+                  <td><strong>Impuestos:</strong></td>
+                  <td><%= @invoice.formatted_tax_amount %></td>
+                </tr>
+                <tr class="table-success">
+                  <td><strong>Total:</strong></td>
+                  <td><strong><%= @invoice.formatted_total %></strong></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productos de la factura -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-box"></i> Productos Facturados</h5>
+        </div>
+        <div class="card-body">
+          <% if @invoice.invoice_items.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Producto</th>
+                    <th>Precio Unit.</th>
+                    <th>Cantidad</th>
+                    <th>Impuesto</th>
+                    <th>Subtotal</th>
+                    <th>Imp. Aplicado</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @invoice.invoice_items.each do |item| %>
+                    <tr>
+                      <td>
+                        <strong><%= item.product.name %></strong>
+                        <br><small class="text-muted">Código: <%= item.product.code %></small>
+                      </td>
+                      <td><%= item.formatted_unit_price %></td>
+                      <td>
+                        <span class="badge bg-secondary"><%= item.quantity %></span>
+                      </td>
+                      <td>
+                        <small><%= item.tax_description %></small>
+                      </td>
+                      <td><%= item.formatted_subtotal %></td>
+                      <td><%= item.formatted_tax_amount %></td>
+                      <td><strong><%= item.formatted_total %></strong></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="text-center py-3">
+              <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+              <p class="text-muted">Esta factura no tiene productos asociados.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel lateral -->
+    <div class="col-md-4">
+      <!-- Información adicional -->
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información Adicional</h6>
+        </div>
+        <div class="card-body">
+          <p class="mb-2">
+            <strong>Creada:</strong><br>
+            <small class="text-muted"><%= @invoice.created_at.strftime("%d de #{I18n.t('date.month_names')[@invoice.created_at.month]} de %Y a las %H:%M") %></small>
+          </p>
+          <p class="mb-2">
+            <strong>Última actualización:</strong><br>
+            <small class="text-muted"><%= @invoice.updated_at.strftime("%d de #{I18n.t('date.month_names')[@invoice.updated_at.month]} de %Y a las %H:%M") %></small>
+          </p>
+          <p class="mb-0">
+            <strong>Estado actual:</strong><br>
+            <% case @invoice.status %>
+            <% when 'emitida' %>
+              <span class="badge bg-primary">Emitida - Pendiente de pago</span>
+            <% when 'pagada' %>
+              <span class="badge bg-success">Pagada - Completada</span>
+            <% when 'anulada' %>
+              <span class="badge bg-danger">Anulada - Stock restaurado</span>
+            <% end %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Acciones rápidas -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-tools"></i> Acciones Rápidas</h6>
+        </div>
+        <div class="card-body">
+          <!-- Botones según el estado -->
+          <% if @invoice.emitida? %>
+            <%= button_to "Marcar como Pagada", mark_as_paid_invoice_path(@invoice), method: :patch,
+                        class: "btn btn-success btn-sm d-block mb-2 w-100",
+                        data: { confirm: "¿Marcar la factura #{@invoice.invoice_number} como pagada?" } %>
+            
+            <%= button_to "Anular Factura", cancel_invoice_path(@invoice), method: :patch,
+                        class: "btn btn-warning btn-sm d-block mb-2 w-100",
+                        data: { confirm: "¿Anular la factura #{@invoice.invoice_number}? Esta acción devolverá el stock pero no es reversible." } %>
+                        
+          <% elsif @invoice.pagada? %>
+            <%= button_to "Anular Factura", cancel_invoice_path(@invoice), method: :patch,
+                        class: "btn btn-warning btn-sm d-block mb-2 w-100",
+                        data: { confirm: "¿Anular la factura pagada #{@invoice.invoice_number}? Esta acción devolverá el stock pero no es reversible." } %>
+          <% end %>
+
+          <!-- Acciones comunes -->
+          <%= link_to invoice_path(@invoice, format: :pdf), 
+                      class: "btn btn-outline-success btn-sm d-block mb-2 w-100" do %>
+            <i class="fas fa-download"></i> Descargar PDF
+          <% end %>
+          
+          <%= link_to "Todas las Facturas", invoices_path, 
+                      class: "btn btn-outline-primary btn-sm d-block mb-2 w-100" %>
+
+          <!-- Eliminar (solo si está anulada) -->
+          <% if @invoice.anulada? %>
+            <hr>
+            <%= button_to "Eliminar Permanentemente", invoice_path(@invoice), method: :delete,
+                        class: "btn btn-danger btn-sm d-block w-100",
+                        data: { confirm: "¿Eliminar permanentemente la factura #{@invoice.invoice_number}? Esta acción no se puede deshacer." } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Alertas según estado -->
+      <% if @invoice.anulada? %>
+        <div class="alert alert-danger mt-3">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Factura Anulada</strong><br>
+          Esta factura ha sido anulada y el stock ha sido restaurado.
+        </div>
+      <% elsif @invoice.emitida? %>
+        <div class="alert alert-info mt-3">
+          <i class="fas fa-info-circle"></i>
+          <strong>Pendiente de Pago</strong><br>
+          Esta factura está emitida pero aún no ha sido pagada.
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

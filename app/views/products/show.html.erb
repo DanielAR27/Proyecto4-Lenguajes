@@ -123,11 +123,11 @@
         <div class="card-body">
           <p class="mb-2">
             <strong>Creado:</strong><br>
-            <small class="text-muted"><%= @product.created_at.strftime("%d de %B de %Y a las %H:%M") %></small>
+            <small class="text-muted"><%= @product.created_at.strftime("%d de #{I18n.t('date.month_names')[@product.created_at.month]} de %Y a las %H:%M") %></small>
           </p>
           <p class="mb-0">
             <strong>Última actualización:</strong><br>
-            <small class="text-muted"><%= @product.updated_at.strftime("%d de %B de %Y a las %H:%M") %></small>
+            <small class="text-muted"><%= @product.updated_at.strftime("%d de #{I18n.t('date.month_names')[@product.updated_at.month]} de %Y a las %H:%M") %></small>
           </p>
         </div>
       </div>

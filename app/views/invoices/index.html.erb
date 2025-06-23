@@ -86,18 +86,18 @@
                     </td>
                     <td class="text-center">
                     <div class="btn-group" role="group">
-                        <button class="btn btn-sm btn-outline-info" title="Ver detalles">
+                        <%= link_to invoice_path(invoice), class: "btn btn-sm btn-outline-info", 
+                                    title: "Ver detalles" do %>
                         <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-warning" title="Editar">
-                        <i class="fas fa-edit"></i>
-                        </button>
+                        <% end %>
                         <button class="btn btn-sm btn-outline-danger" title="Eliminar">
                         <i class="fas fa-trash"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-success" title="Descargar PDF">
+                        <%= link_to invoice_path(invoice, format: :pdf), 
+                                    class: "btn btn-sm btn-outline-success", 
+                                    title: "Descargar PDF" do %>
                         <i class="fas fa-download"></i>
-                        </button>
+                        <% end %>
                     </div>
                     </td>
                 </tr>
@@ -110,7 +110,7 @@
         <div class="text-center py-5">
             <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
             <h4 class="text-muted">No hay facturas</h4>
-            <p class="text-muted">Comienza creando tu primera factura.</p>
+            <p class="text-muted">Comience creando su primera factura.</p>
             <%= link_to "Crear Factura", new_invoice_path, class: "btn btn-primary" %>
         </div>
         <% end %>
