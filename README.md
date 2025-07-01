@@ -308,4 +308,4 @@ El sistema utiliza PostgreSQL como motor de base de datos, proporcionando:
 - **Auditabilidad**: Registro de cambios críticos como movimientos de stock
 - **Recuperación de Errores**: Manejo de excepciones con mensajes informativos para el usuario
 
-Este sistema proporciona una solución completa y robusta para la gestión empresarial, manteniendo la integridad de los datos mientras ofrece una experiencia de usuario intuitiva y eficiente.
+En resumen, este sistema proporciona una solución completa y robusta para la gestión empresarial, manteniendo la integridad de los datos mientras ofrece una experiencia de usuario intuitiva y eficiente.
